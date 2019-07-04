@@ -6,7 +6,6 @@
 //TODO: std::thread animation impl
 
 using namespace wok;
-using namespace canvas;
 
 template<typename ... Views>
 void update(Views &&... views) {
@@ -20,9 +19,9 @@ void update(Views &&... views) {
 int main() {
   engine::init("/dev/input/event15");
 
-  views::view log{"Log", {}, {20, 100}, {1, 1}};
-  views::view inventory{"Inventory", {80, 0}, {20, 100}, {1, 1}};
-  views::view game{"Game", {20, 0}, {60, 100}, {1, 1}};
+  canvas::view log{"Log", {}, {20, 100}, {1, 1}};
+  canvas::view inventory{"Inventory", {80, 0}, {20, 100}, {1, 1}};
+  canvas::view game{"Game", {20, 0}, {60, 100}, {1, 1}};
 
   canvas::align(log);
   canvas::align(inventory);
@@ -37,7 +36,7 @@ int main() {
       break;
 
     if (event::pressed(KEY_L) || event::held(KEY_L)) {
-      views::view v{"Message", {}, {100, 10}, {1, 1}};
+      canvas::view v{"Message", {}, {100, 10}, {1, 1}};
       canvas::stack_vertical(log, v);
 
       log.emplace_back(v);
@@ -46,7 +45,7 @@ int main() {
     }
 
     if (event::pressed(KEY_I) || event::held(KEY_I)) {
-      views::view v{"Item", {}, {100, 20}, {1, 1}};
+      canvas::view v{"Item", {}, {100, 20}, {1, 1}};
       canvas::stack_vertical(inventory, v);
 
       inventory.emplace_back(v);

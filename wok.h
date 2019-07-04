@@ -172,7 +172,7 @@ namespace wok {
             if (x == end.t0 - 1 && y == end.t1 - 1) layer << SET(x, y, "┘");
           }
 
-        layer << SET(start.t0 + 1, start.t1, title) << std::flush;
+        layer << SET(start.t0 + 1, start.t1, title);
       }
 
       void text(const math::rectu &window, const std::string &msg) {
@@ -185,36 +185,32 @@ namespace wok {
 
           layer << SET(window.t0.t0, window.t0.t1 + y++, line);
         }
-
-        layer << std::flush;
       }
     }
 
-    namespace views {
-      struct view : public std::vector<view> {
-        std::string title;
+    struct view : public std::vector<view> {
+      std::string title;
 
-        math::vec2u position;
-        math::vec2u size;
-        math::vec2u padding;
+      math::vec2u position;
+      math::vec2u size;
+      math::vec2u padding;
 
-        math::vec2u offset{};
+      math::vec2u offset{};
 
-        view(const std::string &title,
-             const math::vec2u &position,
-             const math::vec2u &size,
-             const math::vec2u &padding) :
-            title(title),
-            position(position),
-            size(size),
-            padding(padding) {}
+      view(const std::string &title,
+           const math::vec2u &position,
+           const math::vec2u &size,
+           const math::vec2u &padding) :
+          title(title),
+          position(position),
+          size(size),
+          padding(padding) {}
 
-        void draw() const {
-          draw::frame({position, size}, title);
-          for (auto &v : *this) v.draw();
-        }
-      };
-    }
+      void draw() const {
+        draw::frame({position, size}, title);
+        for (auto &v : *this) v.draw();
+      }
+    };
 
     template<typename V>
     void align(V &view) {
