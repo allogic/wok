@@ -1,19 +1,34 @@
-#define WIDTH 211
-#define HEIGHT 57
+#define WIDTH 317
+#define HEIGHT 79
 
-#include "clac.h"
+#include "wok.h"
 
 //TODO: std::thread animation impl
-//TODO: std::ostringstream layers
 
 using namespace wok;
-using namespace clac;
+using namespace canvas;
+
+template<typename ... Views>
+void update(Views &&... views) {
+  auto vs = {views...};
+
+  canvas::begin_layer();
+  for (auto &v : vs) v.draw();
+  canvas::end_layer();
+}
 
 int main() {
   engine::init("/dev/input/event15");
 
-  log l({math::percent({0, 0}), math::percent({20, 100})}, "Log");
-  inventory i({math::percent({80, 0}), math::percent({20, 100})}, "Inventory");
+  views::view log{"Log", {}, {20, 100}, {1, 1}};
+  views::view inventory{"Inventory", {80, 0}, {20, 100}, {1, 1}};
+  views::view game{"Game", {20, 0}, {60, 100}, {1, 1}};
+
+  canvas::align(log);
+  canvas::align(inventory);
+  canvas::align(game);
+
+  update(log, inventory, game);
 
   while (true) {
     event::poll();
@@ -21,13 +36,23 @@ int main() {
     if (event::pressed(KEY_ESC))
       break;
 
-    if (event::pressed(KEY_L))
-      l.push(
-          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+    if (event::pressed(KEY_L) || event::held(KEY_L)) {
+      views::view v{"Message", {}, {100, 10}, {1, 1}};
+      canvas::stack_vertical(log, v);
 
-    if (event::pressed(KEY_I))
-      i.push(
-          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+      log.emplace_back(v);
+
+      update(log);
+    }
+
+    if (event::pressed(KEY_I) || event::held(KEY_I)) {
+      views::view v{"Item", {}, {100, 20}, {1, 1}};
+      canvas::stack_vertical(inventory, v);
+
+      inventory.emplace_back(v);
+
+      update(inventory);
+    }
   }
 
   engine::cleanup();
